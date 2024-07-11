@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">FoodStoreHWCustomListView</string>
+    <string name="productName">Название продукта</string>
+    <string name="productPrice">Цена продукта</string>
+    <string name="titleMain">Добро пожаловать в программу создания магазина продуктов</string>
+    <string name="add">Добавить</string>
+    <string name="creatingStore">Создать магазин</string>
+    <string name="exit">Exit</string>
+</resources>
