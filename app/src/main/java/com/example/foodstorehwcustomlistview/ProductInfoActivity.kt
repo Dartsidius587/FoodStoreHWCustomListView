@@ -13,7 +13,7 @@ import androidx.appcompat.widget.Toolbar
 
 class ProductInfoActivity : AppCompatActivity() {
 
-    val GALLERY_REQUEST = 302
+    private val GALLERY_REQUEST = 302
     private var product: Product? = null
     private var photoProductUri: Uri? = null
 
