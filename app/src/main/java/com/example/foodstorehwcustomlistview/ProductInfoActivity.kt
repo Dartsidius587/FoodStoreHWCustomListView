@@ -1,5 +1,6 @@
 package com.example.foodstorehwcustomlistview
 
+import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
@@ -12,6 +13,10 @@ import androidx.appcompat.widget.Toolbar
 
 class ProductInfoActivity : AppCompatActivity() {
 
+    val GALLERY_REQUEST = 302
+    private var product: Product? = null
+    private var photoProductUri: Uri? = null
+
     private lateinit var titleCreatingTB: Toolbar
     private lateinit var editPictureProductIV: ImageView
     private lateinit var productNameTV: TextView
@@ -22,10 +27,36 @@ class ProductInfoActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_product_info)
         init()
-        editPictureProductIV.setImageURI(Uri.parse(intent.getStringExtra("picture")))
-        productNameTV.text = intent.getStringExtra("name")
-        descriptionProductTV.text = intent.getStringExtra("description")
-        productPriceTV.text = intent.getStringExtra("price")
+
+        product = intent.extras?.getSerializable("product") as Product
+
+        val name = product?.name
+        val description = product?.description
+        val price = product?.price
+        val picture: Uri? = Uri.parse(product?.picture)
+
+        productNameTV.text = name
+        descriptionProductTV.text = description
+        productPriceTV.text = price
+        editPictureProductIV.setImageURI(picture)
+
+        editPictureProductIV.setOnClickListener {
+            val pictureIntent = Intent(Intent.ACTION_PICK)
+            pictureIntent.type = "image/*"
+            startActivityForResult(pictureIntent, GALLERY_REQUEST)
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        editPictureProductIV = findViewById(R.id.editPictureProductIV)
+
+        when (requestCode) {
+            GALLERY_REQUEST -> if (resultCode === RESULT_OK) {
+                photoProductUri = data?.data
+                editPictureProductIV.setImageURI(photoProductUri)
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data)
     }
 
     private fun init() {
@@ -42,12 +73,41 @@ class ProductInfoActivity : AppCompatActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.menu_exit, menu)
+        menuInflater.inflate(R.menu.menu_product_info, menu)
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == R.id.menuExit) finish()
+        when (item.itemId) {
+            R.id.menuBack -> {
+                val itemList = intent.extras?.getInt("position")
+                val products = intent.getSerializableExtra("products")
+                var check = intent.extras?.getBoolean("check")
+                val product = Product(
+                    productNameTV.text.toString(),
+                    descriptionProductTV.text.toString(),
+                    productPriceTV.text.toString(),
+                    photoProductUri.toString()
+                )
+                val list: MutableList<Product> = products as MutableList<Product>
+                if (itemList != null) {
+                    swap(itemList, product, products)
+                }
+                check = false
+                val intent = Intent(this, ActivityCreatingStore::class.java)
+                intent.putExtra("list", list as ArrayList<Product>)
+                intent.putExtra("newCheck", check)
+                startActivity(intent)
+                finish()
+            }
+
+            R.id.menuExit -> finish()
+        }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun swap(item: Int, product: Product, products: MutableList<Product>) {
+        products.add(item + 1, product)
+        products.removeAt(item)
     }
 }

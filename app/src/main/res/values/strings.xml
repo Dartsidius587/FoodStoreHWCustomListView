@@ -7,4 +7,5 @@
     <string name="creatingStore">Создать магазин</string>
     <string name="exit">Exit</string>
     <string name="descriptionProduct">Краткое описание продукта</string>
+    <string name="back">Back</string>
 </resources>

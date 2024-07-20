@@ -18,10 +18,12 @@ class ActivityCreatingStore : AppCompatActivity(), IntentProduct {
 
     private val GALLERY_REQUEST = 302
 
-    private var photoUri: Uri? = null
+    private var photoProductUri: Uri? = null
     private var product: Product? = null
-    private val products: MutableList<Product> = mutableListOf()
+    private var products: MutableList<Product> = mutableListOf()
     private var listAdapter: ListAdapter? = null
+    private var itemList: Int? = null
+    private var check = true
 
     private lateinit var titleCreatingTB: Toolbar
     private lateinit var editPictureProductIV: ImageView
@@ -48,22 +50,39 @@ class ActivityCreatingStore : AppCompatActivity(), IntentProduct {
             productListLV.adapter = listAdapter
             listAdapter?.notifyDataSetChanged()
             clearEditFelds()
+            photoProductUri = null
+            listAdapter?.notifyDataSetChanged()
         }
 
         productListLV.onItemClickListener =
             AdapterView.OnItemClickListener { _, _, position, _ ->
                 val product = listAdapter!!.getItem(position)
+                itemList = position
+                val args = Bundle()
+                args.putSerializable("product", product)
                 intentProduct(product as Product)
+                finish()
             }
 
     }
 
+    override fun onResume() {
+        super.onResume()
+        check = intent.extras?.getBoolean("newCheck") ?: true
+        if (!check) {
+            products = intent.getSerializableExtra("list") as MutableList<Product>
+            listAdapter = ListAdapter(this, products)
+            check = true
+        }
+        productListLV.adapter = listAdapter
+    }
+
     override fun intentProduct(product: Product) {
         val intent = Intent(this, ProductInfoActivity::class.java)
-        intent.putExtra("name", product.name)
-        intent.putExtra("description", product.description)
-        intent.putExtra("price", product.price)
-        intent.putExtra("picture", product.picture)
+        intent.putExtra("product", product)
+        intent.putExtra("products", this.products as ArrayList<Product>)
+        intent.putExtra("position", itemList)
+        intent.putExtra("check", check)
         startActivity(intent)
     }
 
@@ -72,8 +91,8 @@ class ActivityCreatingStore : AppCompatActivity(), IntentProduct {
         editPictureProductIV = findViewById(R.id.editPictureProductIV)
         when (requestCode) {
             GALLERY_REQUEST -> if (resultCode === RESULT_OK) {
-                photoUri = data?.data
-                editPictureProductIV.setImageURI(photoUri)
+                photoProductUri = data?.data
+                editPictureProductIV.setImageURI(photoProductUri)
             }
         }
     }
@@ -83,13 +102,14 @@ class ActivityCreatingStore : AppCompatActivity(), IntentProduct {
         descriptionProductET.text.clear()
         productPriceET.text.clear()
         editPictureProductIV.setImageResource(R.drawable.ic_product)
+
     }
 
     private fun createProduct() {
         val productName = productNameET.text.toString()
         val productDescription = descriptionProductET.text.toString()
         val productPrice = productPriceET.text.toString()
-        val productPicture = photoUri.toString()
+        val productPicture = photoProductUri.toString()
         product = Product(productName, productDescription, productPrice, productPicture)
         products.add(product!!)
     }
@@ -110,7 +130,7 @@ class ActivityCreatingStore : AppCompatActivity(), IntentProduct {
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.menu_exit, menu)
+        menuInflater.inflate(R.menu.menu_creating_product, menu)
         return true
     }
 
