@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".ActivityCreatingStore">
+    tools:context=".ProductInfoActivity">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/titleCreatingTB"
@@ -17,64 +17,49 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="vertical">
 
-        <de.hdodenhof.circleimageview.CircleImageView
+        <ImageView
             android:id="@+id/editPictureProductIV"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
+            android:layout_width="300dp"
+            android:layout_height="300dp"
+            android:layout_gravity="center"
             android:layout_margin="30dp"
             android:src="@drawable/ic_product" />
 
         <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
             android:layout_margin="8dp"
             android:layout_weight="6"
             android:orientation="vertical">
 
-            <EditText
-                android:id="@+id/productNameET"
+            <TextView
+                android:id="@+id/productNameTV"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:gravity="center"
                 android:hint="@string/productName"
-                android:textSize="24sp" />
+                android:textSize="28sp" />
 
-            <EditText
-                android:id="@+id/descriptionProductET"
+            <TextView
+                android:id="@+id/descriptionProductTV"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
                 android:hint="@string/descriptionProduct"
-                android:textSize="14sp"/>
+                android:textSize="22sp" />
 
-            <EditText
-                android:id="@+id/productPriceET"
+            <TextView
+                android:id="@+id/productPriceTV"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="end"
+                android:layout_marginTop="20dp"
                 android:hint="@string/productPrice"
-                android:textSize="20sp" />
-
-
+                android:textSize="26sp" />
 
         </LinearLayout>
     </LinearLayout>
-
-    <Button
-        android:id="@+id/addBTN"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="20dp"
-        android:background="@drawable/round_outline_button"
-        android:text="@string/add"
-        android:textSize="24sp"
-        android:textStyle="bold|italic" />
-
-    <ListView
-        android:id="@+id/productListLV"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        tools:listitem="@layout/item_list" />
 
 </LinearLayout>

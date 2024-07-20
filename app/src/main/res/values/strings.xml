@@ -6,4 +6,5 @@
     <string name="add">Добавить</string>
     <string name="creatingStore">Создать магазин</string>
     <string name="exit">Exit</string>
+    <string name="descriptionProduct">Краткое описание продукта</string>
 </resources>
