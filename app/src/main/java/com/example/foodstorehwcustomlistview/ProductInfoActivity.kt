@@ -3,18 +3,19 @@ package com.example.foodstorehwcustomlistview
 import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 
 class ProductInfoActivity : AppCompatActivity() {
 
     private val GALLERY_REQUEST = 302
-    private var product: Product? = null
     private var photoProductUri: Uri? = null
 
     private lateinit var titleCreatingTB: Toolbar
@@ -28,26 +29,33 @@ class ProductInfoActivity : AppCompatActivity() {
         setContentView(R.layout.activity_product_info)
         init()
 
-        product = intent.extras?.getSerializable("product") as Product
+        val product = intent.extras?.getSerializable("product") as Product
 
-        val name = product?.name
-        val description = product?.description
-        val price = product?.price
-        val picture: Uri? = Uri.parse(product?.picture)
+        val name = product.name
+        val description = product.description
+        val price = product.price
+        val picture: Uri? = Uri.parse(product.picture)
 
         productNameTV.text = name
         descriptionProductTV.text = description
         productPriceTV.text = price
         editPictureProductIV.setImageURI(picture)
+        photoProductUri = picture
 
         editPictureProductIV.setOnClickListener {
-            val pictureIntent = Intent(Intent.ACTION_PICK)
-            pictureIntent.type = "image/*"
-            startActivityForResult(pictureIntent, GALLERY_REQUEST)
+            val picturePickerIntent: Intent?
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                picturePickerIntent = Intent(Intent.ACTION_OPEN_DOCUMENT)
+            } else {
+                picturePickerIntent = Intent(Intent.ACTION_PICK)
+            }
+            picturePickerIntent.type = "image/*"
+            startActivityForResult(picturePickerIntent, GALLERY_REQUEST)
         }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+
         editPictureProductIV = findViewById(R.id.editPictureProductIV)
 
         when (requestCode) {
@@ -81,7 +89,7 @@ class ProductInfoActivity : AppCompatActivity() {
         when (item.itemId) {
             R.id.menuBack -> {
                 val itemList = intent.extras?.getInt("position")
-                val products = intent.getSerializableExtra("products")
+                val products = intent.getSerializableExtra("products") as MutableList<Product>
                 var check = intent.extras?.getBoolean("check")
                 val product = Product(
                     productNameTV.text.toString(),
@@ -89,8 +97,8 @@ class ProductInfoActivity : AppCompatActivity() {
                     productPriceTV.text.toString(),
                     photoProductUri.toString()
                 )
-                val list: MutableList<Product> = products as MutableList<Product>
-                if (itemList != null) {
+                val list: MutableList<Product> = products
+                if(itemList!=null) {
                     swap(itemList, product, products)
                 }
                 check = false
@@ -101,7 +109,10 @@ class ProductInfoActivity : AppCompatActivity() {
                 finish()
             }
 
-            R.id.menuExit -> finish()
+            R.id.menuExit -> {
+                Toast.makeText(this,"Программа завершена.", Toast.LENGTH_LONG).show()
+                finish()
+            }
         }
         return super.onOptionsItemSelected(item)
     }

@@ -2,7 +2,7 @@ package com.example.foodstorehwcustomlistview
 
 import java.io.Serializable
 
-class Product(
+open class Product(
     val name: String?,
     val description: String?,
     val price: String?,
