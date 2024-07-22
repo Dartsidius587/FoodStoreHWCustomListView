@@ -24,9 +24,8 @@ class ActivityCreatingStore : AppCompatActivity(), IntentProduct {
     private var photoProductUri: Uri? = null
     private var listAdapter: ListAdapter? = null
     private var itemList: Int? = null
-    private var check = true
-    private lateinit var products: ProductViewModel
 
+    private lateinit var productsListVM: ProductViewModel
     private lateinit var titleCreatingTB: Toolbar
     private lateinit var editPictureProductIV: ImageView
     private lateinit var productNameET: EditText
@@ -40,13 +39,14 @@ class ActivityCreatingStore : AppCompatActivity(), IntentProduct {
         setContentView(R.layout.activity_creating_store)
         init()
 
-        products = ViewModelProvider(this)[ProductViewModel::class.java]
-        listAdapter = ListAdapter(this@ActivityCreatingStore, products.productList)
+        productsListVM = ViewModelProvider(this)[ProductViewModel::class.java]
 
-        products.listProductViewModel.observe(this){
-            listAdapter = ListAdapter(this@ActivityCreatingStore, products.productList)
-        }
-        productListLV.adapter = listAdapter
+        productsListVM.getListProductsViewModel().observe(this, {
+            val products = it
+            listAdapter = ListAdapter(this@ActivityCreatingStore, products)
+            productListLV.adapter = listAdapter
+            listAdapter?.notifyDataSetChanged()
+        })
 
         editPictureProductIV.setOnClickListener {
             val picturePickerIntent: Intent?
@@ -61,7 +61,6 @@ class ActivityCreatingStore : AppCompatActivity(), IntentProduct {
 
         addBTN.setOnClickListener {
             createProduct()
-            listAdapter?.notifyDataSetChanged()
             clearEditFelds()
             listAdapter?.notifyDataSetChanged()
         }
@@ -76,16 +75,12 @@ class ActivityCreatingStore : AppCompatActivity(), IntentProduct {
 
     override fun onResume() {
         super.onResume()
-        check = intent.extras?.getBoolean("newCheck") ?: true
-        if (!check) {
-            products.productList = intent.getSerializableExtra("list") as MutableList<Product>
-            products.listProductViewModel.observe(this){
-                listAdapter = ListAdapter(this@ActivityCreatingStore, products.productList)
-            }
-            check = true
-        }
-        productListLV.adapter = listAdapter
-        listAdapter?.notifyDataSetChanged()
+        productsListVM.getListProductsViewModel().observe(this, {
+            val products = it
+            listAdapter = ListAdapter(this@ActivityCreatingStore, products)
+            productListLV.adapter = listAdapter
+            listAdapter?.notifyDataSetChanged()
+        })
     }
 
     private fun createProduct() {
@@ -93,8 +88,8 @@ class ActivityCreatingStore : AppCompatActivity(), IntentProduct {
         val productDescription = descriptionProductET.text.toString()
         val productPrice = productPriceET.text.toString()
         val productPicture = photoProductUri.toString()
-        val product = Product(productName, productDescription, productPrice, productPicture)
-        products.productList.add(product)
+        product = Product(productName, productDescription, productPrice, productPicture)
+        productsListVM.addProductList(product!!)
         clearEditFelds()
     }
 
@@ -136,11 +131,8 @@ class ActivityCreatingStore : AppCompatActivity(), IntentProduct {
     override fun intentProduct(product: Product) {
         val intent = Intent(this, ProductInfoActivity::class.java)
         intent.putExtra("product", product)
-        intent.putExtra("products", this.products.productList as ArrayList<Product>)
         intent.putExtra("position", itemList)
-        intent.putExtra("check", check)
         startActivity(intent)
-        finish()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -153,8 +145,6 @@ class ActivityCreatingStore : AppCompatActivity(), IntentProduct {
             Toast.makeText(this,"Программа завершена.",Toast.LENGTH_LONG).show()
             finish()
         }
-
         return super.onOptionsItemSelected(item)
     }
-
 }

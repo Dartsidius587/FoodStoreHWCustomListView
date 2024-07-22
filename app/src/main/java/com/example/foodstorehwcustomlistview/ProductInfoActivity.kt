@@ -12,11 +12,13 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.lifecycle.ViewModelProvider
 
 class ProductInfoActivity : AppCompatActivity() {
 
     private val GALLERY_REQUEST = 302
     private var photoProductUri: Uri? = null
+    private lateinit var productsListVM: ProductViewModel
 
     private lateinit var titleCreatingTB: Toolbar
     private lateinit var editPictureProductIV: ImageView
@@ -41,6 +43,8 @@ class ProductInfoActivity : AppCompatActivity() {
         productPriceTV.text = price
         editPictureProductIV.setImageURI(picture)
         photoProductUri = picture
+
+        productsListVM = ViewModelProvider(this)[ProductViewModel::class.java]
 
         editPictureProductIV.setOnClickListener {
             val picturePickerIntent: Intent?
@@ -89,22 +93,14 @@ class ProductInfoActivity : AppCompatActivity() {
         when (item.itemId) {
             R.id.menuBack -> {
                 val itemList = intent.extras?.getInt("position")
-                val products = intent.getSerializableExtra("products") as MutableList<Product>
-                var check = intent.extras?.getBoolean("check")
                 val product = Product(
                     productNameTV.text.toString(),
                     descriptionProductTV.text.toString(),
                     productPriceTV.text.toString(),
                     photoProductUri.toString()
                 )
-                val list: MutableList<Product> = products
-                if(itemList!=null) {
-                    swap(itemList, product, products)
-                }
-                check = false
+                productsListVM.updateProductsListViewModel(product, itemList)
                 val intent = Intent(this, ActivityCreatingStore::class.java)
-                intent.putExtra("list", list as ArrayList<Product>)
-                intent.putExtra("newCheck", check)
                 startActivity(intent)
                 finish()
             }
@@ -115,10 +111,5 @@ class ProductInfoActivity : AppCompatActivity() {
             }
         }
         return super.onOptionsItemSelected(item)
-    }
-
-    private fun swap(item: Int, product: Product, products: MutableList<Product>) {
-        products.add(item + 1, product)
-        products.removeAt(item)
     }
 }

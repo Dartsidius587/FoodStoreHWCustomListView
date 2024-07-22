@@ -3,8 +3,19 @@ package com.example.foodstorehwcustomlistview
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
-class ProductViewModel: ViewModel() {
+object ProductViewModel: ViewModel() {
 
-    var productList: MutableList<Product> = mutableListOf()
-    val listProductViewModel: MutableLiveData<Product> by lazy { MutableLiveData<Product>() }
+    private var listProductsViewModel: MutableLiveData<MutableList<Product>> = MutableLiveData(mutableListOf())
+
+    fun getListProductsViewModel() = listProductsViewModel
+
+    fun addProductList(product: Product){
+        listProductsViewModel.value?.add(product)
+        listProductsViewModel.value = listProductsViewModel.value
+    }
+
+    fun updateProductsListViewModel(product: Product, index: Int?){
+        if (index != null) listProductsViewModel.value?.add(index+1,product)
+        if (index != null) listProductsViewModel.value?.removeAt(index)
+    }
 }
