@@ -18,14 +18,7 @@ class ListAdapter(context: Context, productList: MutableList<Product>) :
         if (view == null) {
             view = LayoutInflater.from(context).inflate(R.layout.item_list, parent, false)
         }
-        addList(view, product)
-        return view!!
-    }
 
-    private fun addList(
-        view: View?,
-        product: Product?
-    ) {
         val pictureProductIV = view?.findViewById<ImageView>(R.id.pictureProductIV)
         val productNameTV = view?.findViewById<TextView>(R.id.productNameTV)
         val productPriceTV = view?.findViewById<TextView>(R.id.productPriceTV)
@@ -33,5 +26,7 @@ class ListAdapter(context: Context, productList: MutableList<Product>) :
         pictureProductIV?.setImageURI(Uri.parse(product?.picture))
         productNameTV?.text = product?.name
         productPriceTV?.text = product?.price
+
+        return view!!
     }
 }

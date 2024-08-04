@@ -37,16 +37,17 @@ class ActivityCreatingStore : AppCompatActivity(), IntentProduct {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_creating_store)
+        productListLV = findViewById(R.id.productListLV)
         init()
 
         productsListVM = ViewModelProvider(this)[ProductViewModel::class.java]
 
-        productsListVM.getListProductsViewModel().observe(this, {
+        productsListVM.getListProductsViewModel().observe(this) {
             val products = it
             listAdapter = ListAdapter(this@ActivityCreatingStore, products)
             productListLV.adapter = listAdapter
             listAdapter?.notifyDataSetChanged()
-        })
+        }
 
         editPictureProductIV.setOnClickListener {
             val picturePickerIntent: Intent?
@@ -68,6 +69,7 @@ class ActivityCreatingStore : AppCompatActivity(), IntentProduct {
         productListLV.onItemClickListener =
             AdapterView.OnItemClickListener { _, _, position, _ ->
                 val product = listAdapter!!.getItem(position)
+                photoProductUri = null
                 itemList = position
                 intentProduct(product as Product)
             }
@@ -75,12 +77,12 @@ class ActivityCreatingStore : AppCompatActivity(), IntentProduct {
 
     override fun onResume() {
         super.onResume()
-        productsListVM.getListProductsViewModel().observe(this, {
+        productsListVM.getListProductsViewModel().observe(this) {
             val products = it
             listAdapter = ListAdapter(this@ActivityCreatingStore, products)
             productListLV.adapter = listAdapter
             listAdapter?.notifyDataSetChanged()
-        })
+        }
     }
 
     private fun createProduct() {
@@ -125,10 +127,11 @@ class ActivityCreatingStore : AppCompatActivity(), IntentProduct {
         descriptionProductET = findViewById(R.id.descriptionProductET)
         productPriceET = findViewById(R.id.productPriceET)
         addBTN = findViewById(R.id.addBTN)
-        productListLV = findViewById(R.id.productListLV)
+
     }
 
     override fun intentProduct(product: Product) {
+
         val intent = Intent(this, ProductInfoActivity::class.java)
         intent.putExtra("product", product)
         intent.putExtra("position", itemList)

@@ -100,6 +100,7 @@ class ProductInfoActivity : AppCompatActivity() {
                     photoProductUri.toString()
                 )
                 productsListVM.updateProductsListViewModel(product, itemList)
+                photoProductUri = null
                 val intent = Intent(this, ActivityCreatingStore::class.java)
                 startActivity(intent)
                 finish()
